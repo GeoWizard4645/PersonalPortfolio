@@ -2,6 +2,6 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "personalportfolio",
   "assets": {
-    "directory": "./"
+    "directory": "./PersonalPortfolio"
   }
 }
