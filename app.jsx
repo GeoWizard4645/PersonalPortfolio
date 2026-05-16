@@ -87,11 +87,40 @@ function App() {
     <>
       <Nav active={active} onNav={goTo} />
       <div className="page">
-        <Hero />
+        <div className="pin-wrap" data-pin="hero"><Hero /></div>
         <Marquee />
-        <About />
+        <div className="pin-wrap" data-pin="about">
+          <About />
+        </div>
         <Resume />
-        <div className="fold-line" aria-hidden="true" />
+        <div className="pin-wrap" data-pin="split">
+          <div className="split-stage" data-screen-label="Split Transition">
+            <div className="split-stage__bg" aria-hidden="true">
+              <div className="split-stage__teaser">
+                <span className="split-stage__eyebrow">↓ Continue</span>
+                <span className="split-stage__mark">03</span>
+                <span className="split-stage__label">Selected <span className="serif">Work</span></span>
+              </div>
+            </div>
+            <div className="split-stage__half split-stage__half--top" aria-hidden="true">
+              <span className="split-stage__edge">— Résumé end —</span>
+            </div>
+            <div className="split-stage__half split-stage__half--bot" aria-hidden="true">
+              <div className="split-stage__sketch">
+                <span className="split-stage__sketch-mark">— Page 2 of 2 —</span>
+                <svg className="split-stage__sketch-svg" viewBox="0 0 400 90" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <circle cx="16" cy="45" r="3.4" fill="currentColor" stroke="none" />
+                  <path d="M16 45 C 50 12, 86 78, 122 45 S 196 12, 232 45 S 308 78, 344 45" />
+                  <path d="M340 32 L 366 45 L 340 58" />
+                  <path d="M82 70 q 6 6 12 0 t 12 0 t 12 0" opacity="0.55" />
+                  <path d="M250 70 q 6 6 12 0 t 12 0 t 12 0" opacity="0.55" />
+                </svg>
+                <span className="split-stage__sketch-note">done, but never finished.</span>
+                <span className="split-stage__sketch-sig">— </span>
+              </div>
+            </div>
+          </div>
+        </div>
         <Projects />
         <Contact />
         <FooterStrip />

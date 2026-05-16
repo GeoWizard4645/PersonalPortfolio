@@ -1,18 +1,21 @@
 /* ============================================================
-   Per-section exit transitions — driven by scroll position.
-   Each section has its OWN motion personality; no blur.
+   Scroll-driven per-section exit transitions.
 
-   1. HERO       → letters fall like rain (gravity, stagger, drift)
-   2. ABOUT      → heading words scatter L/R; body shrinks up
-   3. RESUME     → lift-and-flip (3D pivot at bottom, tilts away)
-   4. PROJECTS   → rows sling off horizontally, alternating dirs
+   Pinned (sticky 100vh inside an N-vh wrapper, scroll scrubs):
+     HERO   → every letter (title + lede + meta + scroll word)
+              falls under gravity, lands, and STACKS like blocks
+              — pre-computed pile positions prevent overlap.
+     ABOUT  → heading words scatter L/R; body shrinks up.
+     SPLIT  → white sheet split in half; top half slides up,
+              bottom half slides down, revealing Selected Work
+              eyebrow + dark bg behind. Sits between Résumé
+              and Projects.
 
-   Tweak modes: 'cinematic' (full), 'subtle' (~40%), 'off' (no-op).
+   Unpinned (animates as section exits viewport top):
+     PROJECTS → rows slingshot horizontally, alternating dirs
    ============================================================ */
 (function () {
-  const state = {
-    hero: null, about: null, resume: null, projects: null,
-  };
+  const state = { hero: null, about: null, split: null, projects: null };
   let ticking = false;
   let initialized = false;
   let mode = "cinematic";
@@ -20,14 +23,11 @@
 
   /* ---------- helpers ---------- */
 
-  // Seeded-ish pseudo-random by index — stable across reloads.
   function rng(i, salt = 1) {
     const v = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
-    return v - Math.floor(v); // 0..1
+    return v - Math.floor(v);
   }
 
-  // Split a root element's text into <span data-fall> tokens (per-letter).
-  // Preserves existing element wrappers (.serif, .stroke, etc.).
   function splitLetters(root) {
     if (root.dataset.fxSplit === "letters") {
       return Array.from(root.querySelectorAll('[data-fall="l"]'));
@@ -44,10 +44,7 @@
       if (!text) return;
       const frag = document.createDocumentFragment();
       for (const ch of text) {
-        if (/\s/.test(ch)) {
-          frag.appendChild(document.createTextNode(ch));
-          continue;
-        }
+        if (/\s/.test(ch)) { frag.appendChild(document.createTextNode(ch)); continue; }
         const s = document.createElement("span");
         s.textContent = ch;
         s.setAttribute("data-fall", "l");
@@ -62,7 +59,6 @@
     return created;
   }
 
-  // Split a root's text into word tokens.
   function splitWordsIn(root) {
     if (root.dataset.fxSplit === "words") {
       return Array.from(root.querySelectorAll('[data-fall="w"]'));
@@ -81,10 +77,7 @@
       const frag = document.createDocumentFragment();
       parts.forEach((p) => {
         if (!p.length) return;
-        if (/^\s+$/.test(p)) {
-          frag.appendChild(document.createTextNode(p));
-          return;
-        }
+        if (/^\s+$/.test(p)) { frag.appendChild(document.createTextNode(p)); return; }
         const s = document.createElement("span");
         s.textContent = p;
         s.setAttribute("data-fall", "w");
@@ -99,116 +92,147 @@
     return created;
   }
 
-  /* Exit progress for a section. Returns 0 while the section is in
-     view, 1 once its bottom is well above the viewport top. */
-  function exitProgress(el) {
+  function pinProgress(wrap) {
+    const rect = wrap.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = wrap.offsetHeight - vh;
+    if (total <= 0) return 0;
+    return Math.max(0, Math.min(1, -rect.top / total));
+  }
+
+  function exitTopProgress(el) {
     const vh = window.innerHeight;
     const r = el.getBoundingClientRect();
-    const start = vh * 0.65;   // when bottom is at 65% of vh, begin exiting
-    const end   = -vh * 0.25;  // when bottom is 25% above viewport, fully exited
+    const start = vh * 0.20;
+    const end   = -vh * 0.10;
     if (r.bottom >= start) return 0;
     if (r.bottom <= end) return 1;
     return (start - r.bottom) / (start - end);
   }
 
-  /* Per-section progress for projects — use the section element. */
-  function exitProgressFromTop(el) {
-    const vh = window.innerHeight;
-    const r = el.getBoundingClientRect();
-    // Begin once the section's TOP starts going negative
-    const start = vh * 0.2;
-    const end   = -vh * 0.6;
-    if (r.top >= start) return 0;
-    if (r.top <= end) return 1;
-    return (start - r.top) / (start - end);
-  }
-
   /* ---------- prep ---------- */
 
   function prepHero() {
+    const wrap = document.querySelector('.pin-wrap[data-pin="hero"]');
     const hero = document.querySelector(".hero");
-    if (!hero) return false;
+    if (!wrap || !hero) return false;
 
-    // Letter-split inside each hero__title-line > span (the inner span
-    // that owns the rise-in animation). That keeps the rise animation
-    // intact at the parent level and lets us drop individual glyphs.
     const titleInners = hero.querySelectorAll(".hero__title-line > span");
     const titleLetters = [];
-    titleInners.forEach((inner) => {
-      titleLetters.push(...splitLetters(inner));
-    });
+    titleInners.forEach((inner) => { titleLetters.push(...splitLetters(inner)); });
 
-    // Other hero content: word-level is plenty.
+    // Letter-split the small text too: every glyph falls.
     const otherRoots = [
       ...hero.querySelectorAll(".hero__lede"),
       ...hero.querySelectorAll(".hero__meta-block"),
       ...hero.querySelectorAll(".hero__scroll"),
     ];
-    const otherWords = [];
-    otherRoots.forEach((root) => otherWords.push(...splitWordsIn(root)));
+    const smallLetters = [];
+    otherRoots.forEach((root) => smallLetters.push(...splitLetters(root)));
 
-    // Stamp per-token randomness so the fall feels organic.
     titleLetters.forEach((el, i) => {
-      el._dx = (rng(i, 3) - 0.5) * 280;
-      el._rot = (rng(i, 7) - 0.5) * 720;
-      // delay biased by horizontal position — letters at the edges fall first
-      const rect = el.getBoundingClientRect();
-      const center = window.innerWidth / 2;
-      const edgeBias = Math.min(1, Math.abs((rect.left + rect.width / 2) - center) / (window.innerWidth / 2));
-      el._delay = rng(i, 11) * 0.25 + (1 - edgeBias) * 0.05;
+      el._dx = (rng(i, 3) - 0.5) * 120;       // wider horizontal drift
+      el._rot = (rng(i, 7) - 0.5) * 540;      // up to 1.5 turns mid-air
+      el._delay = rng(i, 11) * 0.18;
+      el._finalRot = (rng(i, 17) - 0.5) * 70; // persistent random resting angle
     });
-    otherWords.forEach((el, i) => {
-      el._dx = (rng(i, 13) - 0.5) * 160;
-      el._rot = (rng(i, 17) - 0.5) * 360;
-      el._delay = 0.05 + rng(i, 19) * 0.35;
+    smallLetters.forEach((el, i) => {
+      el._dx = (rng(i, 31) - 0.5) * 80;
+      el._rot = (rng(i, 37) - 0.5) * 360;
+      el._delay = 0.06 + rng(i, 41) * 0.30;
+      el._finalRot = (rng(i, 47) - 0.5) * 55;
     });
 
-    state.hero = { el: hero, titleLetters, otherWords };
+    // Nav atoms — fall as whole tokens (the clock updates from React;
+    // letter-splitting would lose its spans on every re-render).
+    const navAtoms = [];
+    const brand = document.querySelector(".nav .nav__brand");
+    if (brand) navAtoms.push(brand);
+    document.querySelectorAll(".nav .nav__link").forEach((el) => navAtoms.push(el));
+    const clock = document.querySelector(".nav .nav__clock");
+    if (clock) navAtoms.push(clock);
+    navAtoms.forEach((el, i) => {
+      el._dx = (rng(i, 51) - 0.5) * 140;
+      el._rot = (rng(i, 53) - 0.5) * 480;
+      el._delay = rng(i, 55) * 0.12;
+      el._finalRot = (rng(i, 57) - 0.5) * 60;
+      el.style.willChange = "transform";
+    });
+
+    state.hero = { wrap, el: hero, titleLetters, smallLetters, navAtoms };
     return true;
   }
 
+  /* For every falling glyph: compute the page-Y distance to the floor.
+     Floor = hero bottom - 12px. Letters can overlap freely; the goal
+     is that everything is collected on the floor by the end of the
+     pin scrub. Runs after the rise-in completes so bounding rects
+     reflect the final natural layout. */
+  function captureHeroFloor() {
+    const s = state.hero;
+    if (!s) return;
+    const scrollY = window.scrollY;
+    const heroRect = s.el.getBoundingClientRect();
+    const floorPageY = heroRect.bottom + scrollY - 12;
+
+    const all = [...s.titleLetters, ...s.smallLetters, ...s.navAtoms];
+
+    // Neutralise transforms so getBoundingClientRect reads natural layout.
+    all.forEach((el) => {
+      el._savedT = el.style.transform;
+      el._savedO = el.style.opacity;
+      el.style.transform = "none";
+      el.style.opacity = "";
+    });
+
+    all.forEach((el) => {
+      const r = el.getBoundingClientRect();
+      const dist = floorPageY - (r.bottom + scrollY);
+      el._floorDist = dist < 0 ? 0 : dist;
+    });
+
+    // Restore prior inline styles.
+    all.forEach((el) => {
+      el.style.transform = el._savedT || "";
+      el.style.opacity = el._savedO || "";
+    });
+  }
+
   function prepAbout() {
+    const wrap = document.querySelector('.pin-wrap[data-pin="about"]');
     const aboutSec = document.getElementById("about");
-    if (!aboutSec) return false;
+    if (!wrap || !aboutSec) return false;
+
     const heading = aboutSec.querySelector(".about__heading");
-
-    // The heading already contains <span class="split__word">..</span>
-    // produced by the React SplitText component. Re-use those — they
-    // are inline-flex word boxes that compose cleanly with translateX.
-    let headingWords = heading
-      ? Array.from(heading.querySelectorAll(".split__word"))
-      : [];
-
-    // Fallback: if SplitText didn't render for some reason, split words live.
-    if (headingWords.length === 0 && heading) {
-      headingWords = splitWordsIn(heading);
-    }
-
+    let headingWords = heading ? Array.from(heading.querySelectorAll(".split__word")) : [];
+    if (headingWords.length === 0 && heading) headingWords = splitWordsIn(heading);
     headingWords.forEach((el, i) => {
       el._dir = i % 2 === 0 ? -1 : 1;
       el._delay = (i / Math.max(1, headingWords.length)) * 0.3;
     });
 
-    const bodyRows = Array.from(
-      aboutSec.querySelectorAll(".about__body p, .about__stats > div")
-    );
+    const bodyRows = Array.from(aboutSec.querySelectorAll(".about__body p, .about__stats > div"));
 
-    state.about = { el: aboutSec, headingWords, bodyRows };
+    state.about = { wrap, el: aboutSec, headingWords, bodyRows };
     return true;
   }
 
-  function prepResume() {
-    const el = document.querySelector(".resume-wrap");
-    if (!el) return false;
-    state.resume = { el };
+  function prepSplit() {
+    const wrap = document.querySelector('.pin-wrap[data-pin="split"]');
+    if (!wrap) return false;
+    const top = wrap.querySelector(".split-stage__half--top");
+    const bot = wrap.querySelector(".split-stage__half--bot");
+    const teaser = wrap.querySelector(".split-stage__teaser");
+    if (!top || !bot) return false;
+    state.split = { wrap, top, bot, teaser };
     return true;
   }
 
   function prepProjects() {
-    const el = document.querySelector(".projects");
-    if (!el) return false;
-    const rows = Array.from(el.querySelectorAll(".project-row"));
-    state.projects = { el, rows };
+    const projectsEl = document.querySelector(".projects");
+    if (!projectsEl) return false;
+    const rows = Array.from(projectsEl.querySelectorAll(".project-row"));
+    state.projects = { el: projectsEl, rows };
     return true;
   }
 
@@ -217,61 +241,45 @@
   function applyHero() {
     const s = state.hero;
     if (!s) return;
-    const vh = window.innerHeight;
-    const p = exitProgress(s.el);
+    const p = pinProgress(s.wrap);
 
-    // Title letters — gravity (t²) fall with stagger and tumble.
-    s.titleLetters.forEach((el) => {
+    const fall = (el) => {
       const local = Math.max(0, Math.min(1, (p - el._delay) / Math.max(0.001, 1 - el._delay)));
-      const tg = local * local; // gravity acceleration
-      if (local === 0) {
-        el.style.transform = "";
-        el.style.opacity = "";
-        return;
-      }
-      const ty = tg * vh * 1.8 * scale;
-      const tx = el._dx * local * scale;
-      const rot = el._rot * local * scale;
-      const op = 1 - Math.max(0, local - 0.7) / 0.3;
+      if (local === 0) { el.style.transform = ""; el.style.opacity = ""; return; }
+      const tg = local * local;                                  // gravity (t²)
+      const dist = el._floorDist || 0;
+      const ty = dist * tg * scale;
+      const tx = el._dx * local * scale;                         // linear sideways drift
+      // Mid-fall tumble (sin) + persistent random landing angle
+      const rot = (el._rot * Math.sin(tg * Math.PI) + (el._finalRot || 0) * tg) * scale;
       el.style.transform =
         `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) rotate(${rot.toFixed(1)}deg)`;
-      el.style.opacity = op.toFixed(3);
-    });
+      el.style.opacity = "1";
+    };
 
-    // Lede / meta / scroll words — softer fall, slightly later.
-    s.otherWords.forEach((el) => {
-      const startP = 0.04 + el._delay * 0.4;
-      const local = Math.max(0, Math.min(1, (p - startP) / Math.max(0.001, 1 - startP)));
-      const tg = local * local;
-      if (local === 0) {
-        el.style.transform = "";
-        el.style.opacity = "";
-        return;
-      }
-      const ty = tg * vh * 1.5 * scale;
-      const tx = el._dx * local * 0.5 * scale;
-      const rot = el._rot * local * 0.4 * scale;
-      const op = 1 - Math.max(0, local - 0.7) / 0.3;
-      el.style.transform =
-        `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px) rotate(${rot.toFixed(1)}deg)`;
-      el.style.opacity = op.toFixed(3);
-    });
+    s.titleLetters.forEach(fall);
+    s.smallLetters.forEach(fall);
+
+    // Nav atoms: fall during the pinned phase; snap back the instant
+    // the animation completes (so they reappear in the next section).
+    const wrapRect = s.wrap.getBoundingClientRect();
+    const animDone = wrapRect.top < -(s.wrap.offsetHeight - window.innerHeight);
+    if (animDone) {
+      s.navAtoms.forEach((el) => { el.style.transform = ""; el.style.opacity = ""; });
+    } else {
+      s.navAtoms.forEach(fall);
+    }
   }
 
   function applyAbout() {
     const s = state.about;
     if (!s) return;
     const vw = window.innerWidth;
-    const p = exitProgress(s.el);
+    const p = pinProgress(s.wrap);
 
-    // Heading words scatter horizontally (alternating L/R) with rotation.
     s.headingWords.forEach((el) => {
       const local = Math.max(0, Math.min(1, (p - el._delay) / Math.max(0.001, 1 - el._delay)));
-      if (local === 0) {
-        el.style.transform = "";
-        el.style.opacity = "";
-        return;
-      }
+      if (local === 0) { el.style.transform = ""; el.style.opacity = ""; return; }
       const tx = el._dir * local * vw * 0.75 * scale;
       const rot = el._dir * local * 28 * scale;
       const op = 1 - local;
@@ -279,62 +287,45 @@
       el.style.opacity = op.toFixed(3);
     });
 
-    // Body rows: rise & shrink (the inverse of an entry).
     s.bodyRows.forEach((el, i) => {
       const delay = 0.1 + i * 0.05;
       const local = Math.max(0, Math.min(1, (p - delay) / Math.max(0.001, 1 - delay)));
-      if (local === 0) {
-        el.style.transform = "";
-        el.style.opacity = "";
-        return;
-      }
+      if (local === 0) { el.style.transform = ""; el.style.opacity = ""; return; }
       const ty = -local * 110 * scale;
       const sc = 1 - local * 0.18 * scale;
       const op = Math.max(0, 1 - local * 1.2);
-      el.style.transform =
-        `translateY(${ty.toFixed(1)}px) scale(${sc.toFixed(3)})`;
+      el.style.transform = `translateY(${ty.toFixed(1)}px) scale(${sc.toFixed(3)})`;
       el.style.opacity = op.toFixed(3);
     });
   }
 
-  function applyResume() {
-    const s = state.resume;
+  function applySplit() {
+    const s = state.split;
     if (!s) return;
-    const vh = window.innerHeight;
-    const p = exitProgress(s.el);
-    if (p === 0) {
-      s.el.style.transform = "";
-      s.el.style.opacity = "";
-      s.el.style.transformOrigin = "";
-      return;
+    const p = pinProgress(s.wrap);
+    // Halves slide apart with a slight ease-in (cubic) so the split
+    // accelerates as it opens. At p=1 both halves are fully off-screen.
+    const eased = p * p * (3 - 2 * p);     // smoothstep
+    s.top.style.transform = `translateY(${(-eased * 102).toFixed(2)}%)`;
+    s.bot.style.transform = `translateY(${(eased * 102).toFixed(2)}%)`;
+    // Teaser fades in as the gap widens.
+    if (s.teaser) {
+      const op = Math.max(0, Math.min(1, (eased - 0.15) / 0.55));
+      s.teaser.style.opacity = op.toFixed(3);
+      s.teaser.style.transform = `scale(${(0.92 + 0.08 * op).toFixed(3)})`;
     }
-    // Lift-and-flip — pivots at the bottom, top edge tilts away from viewer.
-    s.el.style.transformOrigin = "50% 100%";
-    const ty  = -p * vh * 0.42 * scale;
-    const rotX = p * 58 * scale;
-    const sc  = 1 - p * 0.18 * scale;
-    const op  = 1 - p * 0.65;
-    s.el.style.transform =
-      `translateY(${ty.toFixed(1)}px) rotateX(${rotX.toFixed(1)}deg) scale(${sc.toFixed(3)})`;
-    s.el.style.opacity = op.toFixed(3);
   }
 
   function applyProjects() {
     const s = state.projects;
     if (!s) return;
     const vw = window.innerWidth;
-    const p = exitProgressFromTop(s.el);
+    const p = exitTopProgress(s.el);
 
-    // Each row gets staggered horizontal slingshot. Alternating directions
-    // so the section "shears apart" as the user scrolls past.
     s.rows.forEach((row, i) => {
-      const delay = i * 0.12;
+      const delay = i * 0.08;
       const local = Math.max(0, Math.min(1, (p - delay) / Math.max(0.001, 1 - delay)));
-      if (local === 0) {
-        row.style.transform = "";
-        row.style.opacity = "";
-        return;
-      }
+      if (local === 0) { row.style.transform = ""; row.style.opacity = ""; return; }
       const dir = i % 2 === 0 ? -1 : 1;
       const tx = dir * local * vw * 0.95 * scale;
       const rot = dir * local * 10 * scale;
@@ -350,33 +341,32 @@
     if (mode === "off") return;
     applyHero();
     applyAbout();
-    applyResume();
+    applySplit();
     applyProjects();
   }
 
   function resetAll() {
     function clearList(list) {
-      list && list.forEach((el) => {
-        el.style.transform = "";
-        el.style.opacity = "";
-      });
+      list && list.forEach((el) => { el.style.transform = ""; el.style.opacity = ""; });
     }
     if (state.hero) {
       clearList(state.hero.titleLetters);
-      clearList(state.hero.otherWords);
+      clearList(state.hero.smallLetters);
+      clearList(state.hero.navAtoms);
     }
     if (state.about) {
       clearList(state.about.headingWords);
       clearList(state.about.bodyRows);
     }
-    if (state.resume) {
-      state.resume.el.style.transform = "";
-      state.resume.el.style.opacity = "";
-      state.resume.el.style.transformOrigin = "";
+    if (state.split) {
+      state.split.top.style.transform = "";
+      state.split.bot.style.transform = "";
+      if (state.split.teaser) {
+        state.split.teaser.style.opacity = "";
+        state.split.teaser.style.transform = "";
+      }
     }
-    if (state.projects) {
-      clearList(state.projects.rows);
-    }
+    if (state.projects) clearList(state.projects.rows);
   }
 
   function onScroll() {
@@ -386,56 +376,50 @@
     }
   }
 
+  function onResize() {
+    captureHeroFloor();
+    onScroll();
+  }
+
   function setMode(m) {
     mode = m === "off" || m === "subtle" || m === "cinematic" ? m : "cinematic";
     scale = mode === "subtle" ? 0.45 : 1;
-    if (mode === "off") {
-      resetAll();
-    } else {
-      update();
-    }
+    if (mode === "off") resetAll(); else update();
   }
 
   function tryInit() {
     if (initialized) return;
-    const ready =
-      prepHero() & prepAbout() & prepResume() & prepProjects();
-    if (!ready) {
-      setTimeout(tryInit, 80);
-      return;
-    }
+    const ready = prepHero() & prepAbout() & prepSplit() & prepProjects();
+    if (!ready) { setTimeout(tryInit, 80); return; }
     initialized = true;
 
-    // Free the hero title from its overflow:hidden mask once the
-    // initial rise-in animation has played out. Letters can then fall.
     setTimeout(() => {
       document.querySelectorAll(".hero__title-line").forEach((el) => {
         el.style.overflow = "visible";
       });
-    }, 1400);
+      captureHeroFloor();
+      update();
+    }, 1500);
 
-    // Watch the body for mode changes from the Tweaks panel.
     const obs = new MutationObserver(() => {
       const m = document.body.getAttribute("data-fx-mode") || "cinematic";
       if (m !== mode) setMode(m);
     });
     obs.observe(document.body, { attributes: true, attributeFilter: ["data-fx-mode"] });
 
-    // Initial pickup
     const initialMode = document.body.getAttribute("data-fx-mode") || "cinematic";
     setMode(initialMode);
 
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
+    window.addEventListener("resize", onResize);
     update();
   }
 
-  // Wait until React has mounted the sections.
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => setTimeout(tryInit, 120));
   } else {
     setTimeout(tryInit, 120);
   }
 
-  window.__portfolioFx = { update, resetAll, setMode };
+  window.__portfolioFx = { update, resetAll, setMode, pinProgress, captureHeroFloor };
 })();
