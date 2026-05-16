@@ -1,4 +1,7 @@
 {
-  "name": "personal-portfolio",
-  "pages_build_output_dir": "."
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "personalportfolio",
+  "assets": {
+    "directory": "./PersonalPortfolio"
+  }
 }
