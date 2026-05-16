@@ -162,7 +162,7 @@
      system and place each node at center, then translate using a
      CSS transform that we update each frame.
 
-     This is one rAF loop driving every node — fewer animations, smoother.
+     This is one rAF loop driving every node — fewer animations, smoother. Test comment
   ------------------------------------------------- */
   function buildOrbits() {
     const system = $("#orbit-system");
