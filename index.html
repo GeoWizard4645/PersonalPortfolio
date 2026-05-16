@@ -5,207 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
     <title>Vivaan Shahani — Portfolio</title>
-    <meta
-      name="description"
-      content="Vivaan Shahani — student, builder, writer. Interactive resume and projects."
+    <meta name="description" content="Vivaan Shahani — student, builder, debater, DJ. Interactive resume and selected work." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237dd3fc'/%3E%3Ctext y='.92em' font-family='Helvetica,Arial,sans-serif' font-size='62' font-weight='700'%3EVS%3C/text%3E%3C/svg%3E" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
     />
+
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E" />
   </head>
-  <body data-page="home">
-    <!-- =================== Persistent header =================== -->
-    <header class="topbar">
-      <a href="index.html" class="brand" aria-label="Home">
-        <span class="brand-mark" aria-hidden="true">VS</span>
-        <span class="brand-name">Vivaan Shahani</span>
-      </a>
-      <nav class="topnav" aria-label="Primary">
-        <a href="index.html" class="navlink is-active">Resume</a>
-        <a href="projects.html" class="navlink">Projects</a>
-        <a
-          href="https://github.com/GeoWizard4645"
-          class="navlink navlink--github"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="GitHub profile"
-        >
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.73.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.27.74-1.56-2.55-.29-5.24-1.27-5.24-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .97-.31 3.18 1.17a11.04 11.04 0 0 1 5.79 0c2.21-1.48 3.18-1.17 3.18-1.17.62 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.26 5.65.42.36.79 1.07.79 2.17v3.22c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"
-            />
-          </svg>
-        </a>
-      </nav>
-    </header>
+  <body data-bg-mode="grid">
+    <canvas class="bg-canvas" id="bg-canvas"></canvas>
+    <div class="bg-grain" aria-hidden="true"></div>
 
-    <!-- =================== Snap-scroll container =================== -->
-    <main class="snap" id="snap-root">
-      <!-- ----------- Section 1: Hero ----------- -->
-      <section class="hero" id="hero" aria-label="Introduction">
-        <div class="hero-grid" aria-hidden="true"></div>
+    <div id="root"></div>
 
-        <div class="hero-inner">
-          <p class="eyebrow">Portfolio · v1</p>
-          <h1 class="hero-title">
-            Hi, I'm <span class="accent">Vivaan</span>.
-            <br />
-            <span class="hero-sub">I build, debate, write, and DJ.</span>
-          </h1>
-          <p class="lede">
-            Student. Founder of debate101.org. Occasional essayist on Medium.
-            Long-time tinkerer since the 6th-grade lemonade-stand days.
-          </p>
+    <!-- React + Babel (pinned) -->
+    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-          <div class="hero-cta">
-            <a href="#resume" class="btn btn--primary" data-scroll-to="resume">
-              Interactive Resume
-              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 5v14m0 0l-6-6m6 6l6-6"
-                />
-              </svg>
-            </a>
-            <a href="projects.html" class="btn btn--ghost">View Projects</a>
-          </div>
-        </div>
+    <!-- Plain JS helpers -->
+    <script src="data.js"></script>
+    <script src="cursor.js"></script>
+    <script src="bg.js"></script>
 
-        <button
-          class="scroll-hint"
-          type="button"
-          data-scroll-to="resume"
-          aria-label="Scroll to resume"
-        >
-          <span>scroll</span>
-          <span class="scroll-hint-line" aria-hidden="true"></span>
-        </button>
-      </section>
+    <!-- JSX -->
+    <script type="text/babel" src="tweaks-panel.jsx"></script>
+    <script type="text/babel" src="sections-top.jsx"></script>
+    <script type="text/babel" src="sections-resume.jsx"></script>
+    <script type="text/babel" src="sections-bottom.jsx"></script>
+    <script type="text/babel" src="app.jsx"></script>
 
-      <!-- ----------- Section 2: Interactive Resume ----------- -->
-      <section class="resume" id="resume" aria-label="Interactive resume">
-        <!-- Floating top-left action: traditional resume -->
-        <a
-          class="floating-btn"
-          href="https://docs.google.com/document/d/1RBBdQfQlXH6xVnl47PwVoA5EA3oYhnrrH2IIinqYsvo/edit?usp=sharing"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8m-5-5l5 5m-5-5v5h5M9 13h6M9 17h4"
-            />
-          </svg>
-          View Traditional Resume
-          <svg class="icon icon--xs" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M7 17L17 7M7 7h10v10"
-            />
-          </svg>
-        </a>
-
-        <header class="resume-header">
-          <p class="eyebrow">Interactive Resume</p>
-          <h2>Click an orbit to explore.</h2>
-          <p class="muted">
-            Each satellite below is a chapter — academics, debate, music, code,
-            words. Tap one to open a deeper view.
-          </p>
-        </header>
-
-        <!-- Orbital system. Rings + nodes are wired in app.js -->
-        <div class="orbit-system" id="orbit-system" role="group" aria-label="Resume topics">
-          <div class="orbit-core">
-            <div class="core-inner">
-              <span class="core-mono">VS</span>
-              <span class="core-label">Vivaan Shahani</span>
-            </div>
-            <div class="core-pulse" aria-hidden="true"></div>
-          </div>
-
-          <!-- Inner ring -->
-          <div class="orbit-ring ring-1" aria-hidden="true">
-            <div class="orbit-track"></div>
-          </div>
-
-          <!-- Outer ring -->
-          <div class="orbit-ring ring-2" aria-hidden="true">
-            <div class="orbit-track"></div>
-          </div>
-
-          <!-- Nodes are placed here by app.js, so they share one rAF loop -->
-          <div class="orbit-nodes" id="orbit-nodes"></div>
-        </div>
-
-        <p class="resume-foot muted">
-          Prefer the classic? Use the floating button up there ↖
-        </p>
-      </section>
-    </main>
-
-    <!-- =================== Modal (resume detail) =================== -->
-    <div
-      class="modal"
-      id="modal"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="modal-title"
-      hidden
-    >
-      <div class="modal-backdrop" data-close></div>
-      <div class="modal-card" role="document">
-        <button class="modal-close" type="button" data-close aria-label="Close">
-          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              d="M6 6l12 12M18 6L6 18"
-            />
-          </svg>
-        </button>
-        <div class="modal-icon" id="modal-icon" aria-hidden="true"></div>
-        <p class="eyebrow" id="modal-eyebrow">Role</p>
-        <h3 id="modal-title">Title</h3>
-        <p class="modal-meta" id="modal-meta"></p>
-        <div class="modal-body" id="modal-body"></div>
-      </div>
-    </div>
-
-    <!-- =================== Footer =================== -->
-    <footer class="footer">
-      <p>© <span id="year"></span> Vivaan Shahani · Built with vanilla web.</p>
-      <a
-        href="https://github.com/GeoWizard4645"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="footer-link"
-      >
-        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            fill="currentColor"
-            d="M12 .5a11.5 11.5 0 0 0-3.64 22.42c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.36-3.88-1.36-.53-1.34-1.3-1.7-1.3-1.7-1.06-.73.08-.71.08-.71 1.17.08 1.78 1.2 1.78 1.2 1.04 1.79 2.74 1.27 3.4.97.11-.76.41-1.27.74-1.56-2.55-.29-5.24-1.27-5.24-5.66 0-1.25.45-2.27 1.18-3.07-.12-.29-.51-1.45.11-3.02 0 0 .97-.31 3.18 1.17a11.04 11.04 0 0 1 5.79 0c2.21-1.48 3.18-1.17 3.18-1.17.62 1.57.23 2.73.11 3.02.74.8 1.18 1.82 1.18 3.07 0 4.4-2.69 5.36-5.26 5.65.42.36.79 1.07.79 2.17v3.22c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"
-          />
-        </svg>
-        github.com/GeoWizard4645
-      </a>
-    </footer>
-
-    <script src="app.js" defer></script>
+    <!-- Per-section exit transitions (runs after React mounts) -->
+    <script src="transitions.js"></script>
   </body>
 </html>
