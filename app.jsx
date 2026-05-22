@@ -12,7 +12,7 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 const ACCENT_OPTIONS = ["#7dd3fc", "#a78bfa", "#fb923c", "#f472b6"];
 
 function readRoute() {
-  return window.location.hash === "#projects-all" ? "projects-all" : "home";
+  return window.location.pathname.replace(/\/$/, "") === "/projects" ? "projects-all" : "home";
 }
 
 function App() {
@@ -33,9 +33,9 @@ function App() {
   }, [t.accent, t.bgMode, t.cursorEnabled, t.fxMode]);
 
   useEffectA(() => {
-    const onHash = () => setRoute(readRoute());
-    window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    const onPopState = () => setRoute(readRoute());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
   }, []);
 
   useEffectA(() => {
@@ -46,8 +46,9 @@ function App() {
   // Smooth scroll handler
   function goTo(id) {
     if (route === "projects-all") {
-      // Leaving the archive — set hash, then scroll once home renders.
-      window.location.hash = "";
+      // Leaving the archive — set path, then scroll once home renders.
+      window.history.pushState({}, "", "/");
+      setRoute("home");
       requestAnimationFrame(() => requestAnimationFrame(() => goTo(id)));
       return;
     }
@@ -63,10 +64,12 @@ function App() {
   }
 
   function openProjectsAll() {
-    window.location.hash = "projects-all";
+    window.history.pushState({}, "", "/projects");
+    setRoute("projects-all");
   }
   function closeProjectsAll() {
-    window.location.hash = "";
+    window.history.pushState({}, "", "/");
+    setRoute("home");
   }
 
   // IntersectionObserver — active section + reveals + fold-line activation.
