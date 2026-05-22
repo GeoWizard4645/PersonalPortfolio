@@ -15,11 +15,13 @@
      PROJECTS → rows slingshot horizontally, alternating dirs
    ============================================================ */
 (function () {
-  const state = { hero: null, about: null, split: null, projects: null };
+  const state = { hero: null, about: null, split: null, projects: null, projectsCarousel: null };
   let ticking = false;
   let initialized = false;
   let mode = "cinematic";
   let scale = 1;
+  const MOBILE_MQ = window.matchMedia("(max-width: 760px)");
+  let isMobile = MOBILE_MQ.matches;
 
   /* ---------- helpers ---------- */
 
@@ -236,6 +238,34 @@
     return true;
   }
 
+  function prepProjectsCarousel() {
+    const wrap = document.querySelector('.pin-wrap[data-pin="projects-carousel"]');
+    if (!wrap) return true; // not on this page — that's fine
+    const stageEl = wrap.querySelector(".projects-carousel");
+    const track = wrap.querySelector(".projects-carousel__track");
+    const viewport = wrap.querySelector(".projects-carousel__viewport");
+    const fill = wrap.querySelector(".projects-carousel__fill");
+    const scrollHint = wrap.querySelector(".projects-carousel__scroll");
+    if (!track || !viewport) return false;
+    state.projectsCarousel = { wrap, stageEl, track, viewport, fill, scrollHint };
+    return true;
+  }
+
+  function applyProjectsCarousel() {
+    const s = state.projectsCarousel;
+    if (!s) return;
+    const p = pinProgress(s.wrap);
+    const trackW = s.track.scrollWidth;
+    const viewW = s.viewport.clientWidth;
+    const maxScroll = Math.max(0, trackW - viewW);
+    s.track.style.transform = `translateX(${(-p * maxScroll).toFixed(1)}px)`;
+    if (s.scrollHint) {
+      // Fade the "Continue" hint as we get past 80% of horizontal travel.
+      const op = Math.max(0, 1 - Math.max(0, (p - 0.8) / 0.2));
+      s.scrollHint.style.opacity = op.toFixed(3);
+    }
+  }
+
   /* ---------- apply ---------- */
 
   function applyHero() {
@@ -338,11 +368,12 @@
   }
 
   function update() {
-    if (mode === "off") return;
+    if (mode === "off" || isMobile) return;
     applyHero();
     applyAbout();
     applySplit();
     applyProjects();
+    applyProjectsCarousel();
   }
 
   function resetAll() {
@@ -367,6 +398,10 @@
       }
     }
     if (state.projects) clearList(state.projects.rows);
+    if (state.projectsCarousel) {
+      state.projectsCarousel.track.style.transform = "";
+      if (state.projectsCarousel.fill) state.projectsCarousel.fill.style.transform = "";
+    }
   }
 
   function onScroll() {
@@ -389,7 +424,23 @@
 
   function tryInit() {
     if (initialized) return;
-    const ready = prepHero() & prepAbout() & prepSplit() & prepProjects();
+    // On mobile we skip the entire scroll-driven engine. The CSS flattens
+    // pin-wraps into normal flow and the rest of the page works fine.
+    if (isMobile) {
+      initialized = true;
+      MOBILE_MQ.addEventListener("change", (e) => {
+        if (!e.matches) {
+          // Crossed back into desktop. Reload — re-running prep+layout
+          // mid-session is fragile and a refresh is the cleanest reset.
+          window.location.reload();
+        }
+      });
+      return;
+    }
+    // If we're on the archive route, there's no home DOM to prep against —
+    // bail out and wait for the route-change reinit() to call us again.
+    if (document.body.getAttribute("data-route") === "projects-all") return;
+    const ready = prepHero() & prepAbout() & prepSplit() & prepProjects() & prepProjectsCarousel();
     if (!ready) { setTimeout(tryInit, 80); return; }
     initialized = true;
 
@@ -410,6 +461,10 @@
     const initialMode = document.body.getAttribute("data-fx-mode") || "cinematic";
     setMode(initialMode);
 
+    MOBILE_MQ.addEventListener("change", (e) => {
+      if (e.matches) window.location.reload();
+    });
+
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     update();
@@ -421,5 +476,14 @@
     setTimeout(tryInit, 120);
   }
 
-  window.__portfolioFx = { update, resetAll, setMode, pinProgress, captureHeroFloor };
+  function reinit() {
+    if (isMobile) return;
+    // The home tree may have unmounted and remounted (route swap).
+    // Wipe stale references and re-prep against the current DOM.
+    state.hero = state.about = state.split = state.projects = state.projectsCarousel = null;
+    initialized = false;
+    setTimeout(tryInit, 60);
+  }
+
+  window.__portfolioFx = { update, resetAll, setMode, pinProgress, captureHeroFloor, reinit };
 })();

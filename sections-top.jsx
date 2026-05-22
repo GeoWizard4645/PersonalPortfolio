@@ -50,7 +50,7 @@ function Nav({ active, onNav }) {
   const links = [
     { id: "about", label: "About", num: "01" },
     { id: "resume", label: "Resume", num: "02" },
-    { id: "work", label: "Work", num: "03" },
+    { id: "work", label: "Projects", num: "03" },
     { id: "contact", label: "Contact", num: "04" },
   ];
   return (

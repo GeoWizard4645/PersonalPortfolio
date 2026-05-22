@@ -1,8 +1,8 @@
-/* Projects + Contact + Footer */
+/* Projects (carousel) + ProjectsAll (grid page) + Contact + Footer */
 const P = window.PORTFOLIO_DATA.projects;
-const { useState: useStateP, useRef: useRefP, useEffect: useEffectP } = React;
+const { useState: useStateP, useRef: useRefP, useEffect: useEffectP, useMemo: useMemoP } = React;
 
-/* small canvas painter for the inline project preview */
+/* small canvas painter for project previews */
 function paintPreview(canvas, kind) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const r = canvas.getBoundingClientRect();
@@ -12,17 +12,14 @@ function paintPreview(canvas, kind) {
   const ctx = canvas.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   const w = r.width, h = r.height;
-  const c1 = "#7dd3fc"; // accent
-  const ink = "#02131e";
+  const c1 = "#7dd3fc";
 
-  // base — ink wash
   const g = ctx.createLinearGradient(0, 0, w, h);
   g.addColorStop(0, "#02131e");
   g.addColorStop(1, "#0b1822");
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, w, h);
 
-  // soft grid background
   ctx.strokeStyle = "rgba(125,211,252,0.08)";
   ctx.lineWidth = 1;
   for (let x = 0; x < w; x += 28) {
@@ -89,7 +86,6 @@ function paintPreview(canvas, kind) {
     }
   }
 
-  // crosshair corners
   ctx.strokeStyle = "rgba(125,211,252,0.55)";
   ctx.lineWidth = 1;
   const L = 10;
@@ -103,113 +99,263 @@ function paintPreview(canvas, kind) {
   });
 }
 
-function ProjectRow({ p, i, expanded, onEnter, onLeave }) {
+/* Carousel card — used in the horizontal carousel on the home page. */
+function ProjectCard({ p }) {
   const canvasRef = useRefP(null);
   useEffectP(() => {
-    if (canvasRef.current && expanded) {
-      paintPreview(canvasRef.current, p.preview);
-    }
-  }, [expanded]);
+    if (canvasRef.current) paintPreview(canvasRef.current, p.preview);
+    const onResize = () => {
+      if (canvasRef.current) paintPreview(canvasRef.current, p.preview);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [p.preview]);
 
   return (
     <a
       href={p.href}
       target={p.href === "#" ? undefined : "_blank"}
       rel="noopener noreferrer"
-      className={`project-row ${expanded ? "is-expanded" : ""}`}
+      className="project-card"
       data-cursor="hover"
-      onPointerEnter={onEnter}
-      onFocus={onEnter}
     >
-      <div className="project-row__main">
-        <span className="project-row__num">{p.num}</span>
-        <span className="project-row__title">
+      <div className="project-card__head">
+        <span className="project-card__num">{p.num}</span>
+        <span className="project-card__year">{p.year}</span>
+      </div>
+      <div className="project-card__preview">
+        <span className="project-card__preview-tag">↗ Visit</span>
+        <canvas ref={canvasRef} />
+      </div>
+      <h3 className="project-card__title">
+        {p.title.split(" ").map((w, k, arr) => (
+          <React.Fragment key={k}>
+            {k === arr.length - 1 ? <span className="serif">{w}</span> : <>{w} </>}
+          </React.Fragment>
+        ))}
+      </h3>
+      <p className="project-card__role">{p.role}</p>
+      <div className="project-card__tags">
+        {p.tags.map((t, k) => <span key={k} className="project-card__tag">{t}</span>)}
+      </div>
+      <div className="project-card__foot">
+        <span className="project-card__foot-label">What I did</span>
+        <p className="project-card__foot-text">{p.did}</p>
+      </div>
+      <span className="project-card__arrow" aria-hidden="true">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M7 17L17 7M9 7h8v8" />
+        </svg>
+      </span>
+    </a>
+  );
+}
+
+function Projects({ onViewAll }) {
+  return (
+    <div className="pin-wrap" data-pin="projects-carousel">
+      <section className="projects projects--carousel" id="work">
+        <div className="projects-carousel">
+          <div className="projects-carousel__head">
+            <div>
+              <div className="section__num">[ <span>03</span> ] · Projects</div>
+              <h2 className="projects__heading" data-reveal>
+                <SplitText>Shipped things,</SplitText>
+                <br /><SplitText delay={120}>kept the receipts.</SplitText>
+              </h2>
+            </div>
+            <div className="projects-carousel__head-right">
+              <p className="projects__note" data-reveal>
+                Scroll down — the cards shift sideways. Hover a card or hit View All for the full archive.
+              </p>
+              <button
+                type="button"
+                className="projects-carousel__view-all"
+                onClick={onViewAll}
+                data-cursor="hover"
+              >
+                View All Projects
+                <span aria-hidden="true">→</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="projects-carousel__viewport">
+            <div className="projects-carousel__track">
+              {P.map((p) => <ProjectCard key={p.num} p={p} />)}
+              <div className="projects-carousel__endcap">
+                <span className="projects-carousel__endcap-mark">— End of reel —</span>
+                <button
+                  type="button"
+                  className="projects-carousel__endcap-btn"
+                  onClick={onViewAll}
+                  data-cursor="hover"
+                >
+                  See all projects →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="projects-carousel__scroll" aria-hidden="true">
+            <span>Continue</span>
+            <span className="projects-carousel__scroll-line" />
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+/* ===== All projects page ===== */
+function ProjectsAll({ onBack }) {
+  const [q, setQ] = useStateP("");
+  const filtered = useMemoP(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return P;
+    return P.filter((p) => {
+      const hay = [
+        p.title, p.role, p.year, p.what, p.did, p.learned,
+        ...(p.tags || []), ...(p.tools || []),
+      ].filter(Boolean).join(" ").toLowerCase();
+      return hay.includes(term);
+    });
+  }, [q]);
+
+  return (
+    <section className="projects-all" id="projects-all">
+      <div className="projects-all__inner">
+        <div className="projects-all__top">
+          <button
+            type="button"
+            className="projects-all__back"
+            onClick={onBack}
+            data-cursor="hover"
+          >
+            <span aria-hidden="true">←</span> Back home
+          </button>
+          <div className="projects-all__count">
+            {filtered.length} / {P.length} projects
+          </div>
+        </div>
+
+        <header className="projects-all__head">
+          <div className="section__num">[ <span>—</span> ] · Archive</div>
+          <h1 className="projects-all__title">
+            All <span className="serif">projects.</span>
+          </h1>
+          <p className="projects-all__lede">
+            Every shipped thing — non-profits, audio, journalism, and the 6th-grade lemonade-stand origin. Search by name, stack, or year.
+          </p>
+        </header>
+
+        <div className="projects-all__search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.3-4.3" />
+          </svg>
+          <input
+            type="search"
+            placeholder="Search projects, tags, tools, years…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            aria-label="Search projects"
+            data-cursor="text"
+          />
+          {q && (
+            <button
+              type="button"
+              className="projects-all__search-clear"
+              onClick={() => setQ("")}
+              aria-label="Clear search"
+              data-cursor="hover"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        {filtered.length === 0 ? (
+          <div className="projects-all__empty">
+            No projects matched <em>"{q}"</em>. Try fewer letters.
+          </div>
+        ) : (
+          <div className="projects-all__grid">
+            {filtered.map((p) => <ProjectGridItem key={p.num} p={p} />)}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function ProjectGridItem({ p }) {
+  const canvasRef = useRefP(null);
+  useEffectP(() => {
+    if (canvasRef.current) paintPreview(canvasRef.current, p.preview);
+    const onResize = () => {
+      if (canvasRef.current) paintPreview(canvasRef.current, p.preview);
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [p.preview]);
+
+  return (
+    <a
+      href={p.href}
+      target={p.href === "#" ? undefined : "_blank"}
+      rel="noopener noreferrer"
+      className="projects-all__card"
+      data-cursor="hover"
+    >
+      <div className="projects-all__card-preview">
+        <canvas ref={canvasRef} />
+        <span className="projects-all__card-tag">↗ {p.year}</span>
+      </div>
+      <div className="projects-all__card-body">
+        <div className="projects-all__card-meta">
+          <span>{p.num}</span>
+          <span>{p.year}</span>
+        </div>
+        <h3 className="projects-all__card-title">
           {p.title.split(" ").map((w, k, arr) => (
             <React.Fragment key={k}>
               {k === arr.length - 1 ? <span className="serif">{w}</span> : <>{w} </>}
             </React.Fragment>
           ))}
-        </span>
-        <span className="project-row__role">{p.role}</span>
-        <span className="project-row__tags">
-          {p.tags.map((t, k) => <span key={k} className="project-row__tag">{t}</span>)}
-        </span>
-        <span className="project-row__year">{p.year}</span>
-        <span className="project-row__arrow">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M7 17L17 7M9 7h8v8" />
-          </svg>
-        </span>
-      </div>
+        </h3>
+        <p className="projects-all__card-role">{p.role}</p>
 
-      <div className="project-row__details">
-        <div className="project-row__preview">
-          <span className="project-row__preview-tag">↗ Visit · {p.year}</span>
-          <canvas ref={canvasRef} />
+        <div className="projects-all__card-section">
+          <span className="projects-all__card-label">What it is</span>
+          <p>{p.what}</p>
         </div>
-        <div className="project-row__info">
-          <div className="project-row__info-block">
-            <span className="project-row__info-label">What it is</span>
-            <p className="project-row__info-text">{p.what}</p>
-          </div>
-          <div className="project-row__info-block">
-            <span className="project-row__info-label">What I did</span>
-            <p className="project-row__info-text">{p.did}</p>
-          </div>
-          <div className="project-row__info-block">
-            <span className="project-row__info-label">What I learned</span>
-            <p className="project-row__info-text">{p.learned}</p>
-          </div>
-          {p.tools && (
-            <div className="project-row__info-block">
-              <span className="project-row__info-label">Tooling</span>
-              <span className="project-row__info-tools">
-                {p.tools.map((t, k) => (
-                  <span key={k} className="project-row__info-tool">{t}</span>
-                ))}
-              </span>
+        <div className="projects-all__card-section">
+          <span className="projects-all__card-label">What I did</span>
+          <p>{p.did}</p>
+        </div>
+        <div className="projects-all__card-section">
+          <span className="projects-all__card-label">What I learned</span>
+          <p>{p.learned}</p>
+        </div>
+
+        <div className="projects-all__card-tags">
+          {p.tags.map((t, k) => (
+            <span key={k} className="projects-all__card-tagchip">{t}</span>
+          ))}
+        </div>
+        {p.tools && (
+          <div className="projects-all__card-tools">
+            <span className="projects-all__card-label">Tooling</span>
+            <div>
+              {p.tools.map((t, k) => (
+                <span key={k} className="projects-all__card-tool">{t}</span>
+              ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </a>
-  );
-}
-
-function Projects() {
-  const [hovered, setHovered] = useStateP(null);
-
-  return (
-    <section className="section projects" id="work">
-      <div className="projects__head">
-        <div>
-          <div className="section__num">[ <span>03</span> ] · Selected Work</div>
-          <h2 className="projects__heading" data-reveal>
-            <SplitText>Shipped things,</SplitText>
-            <br /><SplitText delay={120}>kept the receipts.</SplitText>
-          </h2>
-        </div>
-        <p className="projects__note" data-reveal>
-          Four projects. A non-profit platform, a DJ booking page, an essay archive, and one nostalgic 6th-grade origin. Hover any row — the row expands inline.
-        </p>
-      </div>
-
-      <div
-        className="projects__list"
-        onPointerLeave={() => setHovered(null)}
-      >
-        {P.map((p, i) => (
-          <ProjectRow
-            key={p.num}
-            p={p}
-            i={i}
-            expanded={hovered === i}
-            onEnter={() => setHovered(i)}
-            onLeave={() => setHovered(null)}
-          />
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -260,4 +406,4 @@ function FooterStrip() {
   );
 }
 
-Object.assign(window, { Projects, Contact, FooterStrip });
+Object.assign(window, { Projects, ProjectsAll, Contact, FooterStrip });

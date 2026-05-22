@@ -11,9 +11,14 @@ const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
 
 const ACCENT_OPTIONS = ["#7dd3fc", "#a78bfa", "#fb923c", "#f472b6"];
 
+function readRoute() {
+  return window.location.hash === "#projects-all" ? "projects-all" : "home";
+}
+
 function App() {
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [active, setActive] = useStateA("about");
+  const [route, setRoute] = useStateA(readRoute);
 
   // Apply tweaks to DOM
   useEffectA(() => {
@@ -27,8 +32,25 @@ function App() {
     document.body.style.cursor = t.cursorEnabled ? "none" : "auto";
   }, [t.accent, t.bgMode, t.cursorEnabled, t.fxMode]);
 
+  useEffectA(() => {
+    const onHash = () => setRoute(readRoute());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffectA(() => {
+    document.body.setAttribute("data-route", route);
+    window.scrollTo({ top: 0 });
+  }, [route]);
+
   // Smooth scroll handler
   function goTo(id) {
+    if (route === "projects-all") {
+      // Leaving the archive — set hash, then scroll once home renders.
+      window.location.hash = "";
+      requestAnimationFrame(() => requestAnimationFrame(() => goTo(id)));
+      return;
+    }
     if (id === "top") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -40,91 +62,120 @@ function App() {
     }
   }
 
-  // IntersectionObserver — active section + reveals + fold-line activation
+  function openProjectsAll() {
+    window.location.hash = "projects-all";
+  }
+  function closeProjectsAll() {
+    window.location.hash = "";
+  }
+
+  // IntersectionObserver — active section + reveals + fold-line activation.
+  // Re-binds across route changes because the home DOM tree unmounts/remounts.
   useEffectA(() => {
-    const sections = ["about", "resume", "work", "contact"]
-      .map((id) => document.getElementById(id))
-      .filter(Boolean);
+    let cleanup;
+    const setup = () => {
+      const sections = ["about", "resume", "work", "contact"]
+        .map((id) => document.getElementById(id))
+        .filter(Boolean);
 
-    const navObs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
-    );
-    sections.forEach((s) => navObs.observe(s));
+      const navObs = new IntersectionObserver(
+        (entries) => {
+          const visible = entries
+            .filter((e) => e.isIntersecting)
+            .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+          if (visible[0]) setActive(visible[0].target.id);
+        },
+        { rootMargin: "-40% 0px -50% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+      );
+      sections.forEach((s) => navObs.observe(s));
 
-    const revObs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("is-in");
-            revObs.unobserve(e.target);
-          }
-        });
-      },
-      { rootMargin: "-10% 0px -10% 0px", threshold: 0.05 }
-    );
-    document.querySelectorAll("[data-reveal]").forEach((el) => revObs.observe(el));
+      const revObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("is-in");
+              revObs.unobserve(e.target);
+            }
+          });
+        },
+        { rootMargin: "-10% 0px -10% 0px", threshold: 0.05 }
+      );
+      document.querySelectorAll("[data-reveal]").forEach((el) => revObs.observe(el));
 
-    const foldObs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          e.target.classList.toggle("is-active", e.isIntersecting);
-        });
-      },
-      { threshold: 0.5 }
-    );
-    document.querySelectorAll(".fold-line").forEach((el) => foldObs.observe(el));
+      const foldObs = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((e) => {
+            e.target.classList.toggle("is-active", e.isIntersecting);
+          });
+        },
+        { threshold: 0.5 }
+      );
+      document.querySelectorAll(".fold-line").forEach((el) => foldObs.observe(el));
 
-    return () => { navObs.disconnect(); revObs.disconnect(); foldObs.disconnect(); };
-  }, []);
+      // Re-prep the scroll-fx engine now that the new DOM is live.
+      if (window.__portfolioFx && window.__portfolioFx.reinit) {
+        window.__portfolioFx.reinit();
+      }
+
+      cleanup = () => { navObs.disconnect(); revObs.disconnect(); foldObs.disconnect(); };
+    };
+    // Wait a tick so the new tree is mounted before observing.
+    const id = requestAnimationFrame(setup);
+    return () => {
+      cancelAnimationFrame(id);
+      if (cleanup) cleanup();
+    };
+  }, [route]);
 
   return (
     <>
-      <Nav active={active} onNav={goTo} />
-      <div className="page">
-        <div className="pin-wrap" data-pin="hero"><Hero /></div>
-        <Marquee />
-        <div className="pin-wrap" data-pin="about">
-          <About />
+      <Nav active={route === "projects-all" ? "work" : active} onNav={goTo} />
+      {route === "projects-all" ? (
+        <div className="page page--archive">
+          <ProjectsAll onBack={closeProjectsAll} />
+          <FooterStrip />
         </div>
-        <Resume />
-        <div className="pin-wrap" data-pin="split">
-          <div className="split-stage" data-screen-label="Split Transition">
-            <div className="split-stage__bg" aria-hidden="true">
-              <div className="split-stage__teaser">
-                <span className="split-stage__eyebrow">↓ Continue</span>
-                <span className="split-stage__mark">03</span>
-                <span className="split-stage__label">Selected <span className="serif">Work</span></span>
+      ) : (
+        <div className="page">
+          <div className="pin-wrap" data-pin="hero"><Hero /></div>
+          <Marquee />
+          <div className="pin-wrap" data-pin="about">
+            <About />
+          </div>
+          <Resume />
+          <div className="pin-wrap" data-pin="split">
+            <div className="split-stage" data-screen-label="Split Transition">
+              <div className="split-stage__bg" aria-hidden="true">
+                <div className="split-stage__teaser">
+                  <span className="split-stage__eyebrow">↓ Continue</span>
+                  <span className="split-stage__mark">03</span>
+                  <span className="split-stage__label"><span className="serif">Projects</span></span>
+                </div>
               </div>
-            </div>
-            <div className="split-stage__half split-stage__half--top" aria-hidden="true">
-              <span className="split-stage__edge">— Résumé end —</span>
-            </div>
-            <div className="split-stage__half split-stage__half--bot" aria-hidden="true">
-              <div className="split-stage__sketch">
-                <span className="split-stage__sketch-mark">— Page 2 of 2 —</span>
-                <svg className="split-stage__sketch-svg" viewBox="0 0 400 90" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <circle cx="16" cy="45" r="3.4" fill="currentColor" stroke="none" />
-                  <path d="M16 45 C 50 12, 86 78, 122 45 S 196 12, 232 45 S 308 78, 344 45" />
-                  <path d="M340 32 L 366 45 L 340 58" />
-                  <path d="M82 70 q 6 6 12 0 t 12 0 t 12 0" opacity="0.55" />
-                  <path d="M250 70 q 6 6 12 0 t 12 0 t 12 0" opacity="0.55" />
-                </svg>
-                <span className="split-stage__sketch-note">done, but never finished.</span>
-                <span className="split-stage__sketch-sig">— </span>
+              <div className="split-stage__half split-stage__half--top" aria-hidden="true">
+                <span className="split-stage__edge">— Résumé end —</span>
+              </div>
+              <div className="split-stage__half split-stage__half--bot" aria-hidden="true">
+                <div className="split-stage__sketch">
+                  <span className="split-stage__sketch-mark">— Page 2 of 2 —</span>
+                  <svg className="split-stage__sketch-svg" viewBox="0 0 400 90" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="16" cy="45" r="3.4" fill="currentColor" stroke="none" />
+                    <path d="M16 45 C 50 12, 86 78, 122 45 S 196 12, 232 45 S 308 78, 344 45" />
+                    <path d="M340 32 L 366 45 L 340 58" />
+                    <path d="M82 70 q 6 6 12 0 t 12 0 t 12 0" opacity="0.55" />
+                    <path d="M250 70 q 6 6 12 0 t 12 0 t 12 0" opacity="0.55" />
+                  </svg>
+                  <span className="split-stage__sketch-note">done, but never finished.</span>
+                  <span className="split-stage__sketch-sig">— </span>
+                </div>
               </div>
             </div>
           </div>
+          <Projects onViewAll={openProjectsAll} />
+          <Contact />
+          <FooterStrip />
         </div>
-        <Projects />
-        <Contact />
-        <FooterStrip />
-      </div>
+      )}
 
       <TweaksPanel title="Portfolio Tweaks">
         <TweakSection label="Accent">
