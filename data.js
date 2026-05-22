@@ -175,15 +175,15 @@ window.PORTFOLIO_DATA = {
       role: "Designed and shipped a personal DJ landing page from scratch.",
       tags: ["Web", "Audio", "Design"],
       year: "2024 —",
-      href: "https://geowizard4645.github.io/DJ/",
+      href: "dj.vivaanshahani.com",
       preview: "equalizer",
       what:
         "A personal DJ identity and booking surface — landing page, set list, contact, and a sandbox for audio-driven web experiments.",
       did:
         "Solo designer + developer. Built it in vanilla HTML/CSS/JS, designed the visual identity, picked the typography, and shipped on GitHub Pages. Performed at school and community events using it as my front door.",
       learned:
-        "Vanilla web goes a long way. Real performances make it personal in a way React tutorials never will.",
-      tools: ["HTML", "CSS", "JS", "GitHub Pages"],
+        "Desigining proffessional websites to land gigs. How to DJ. Check out the website to book me.",
+      tools: ["HTML", "CSS", "JS", "GitHub Pages","Rekordbox","Music Skills"],
     },
     {
       num: "03",
