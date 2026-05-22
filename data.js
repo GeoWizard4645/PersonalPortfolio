@@ -11,7 +11,7 @@ window.PORTFOLIO_DATA = {
       "I move between fields on purpose. Debate sharpens the argument; engineering ships the artifact; writing makes both legible. I'm looking for a summer where I can put real code into a real product.",
     ],
     stats: [
-      { num: "3.98", unit: "GPA", label: "Academic standing — straight A's, AP CS + AP Euro" },
+      { num: "4.00", unit: "GPA UW", label: "Academic standing — straight A's, AP CS + AP Euro" },
       { num: "15K", unit: "+ reads", label: "Journalism and essays published on Medium" },
       { num: "4", unit: "ventures", label: "Debate101, Solarflare, Math Monkey, Barky Bites" },
       { num: "Q-finals", unit: "", label: "Woodward National Debate Tournament, Atlanta" },
@@ -19,7 +19,7 @@ window.PORTFOLIO_DATA = {
   },
   resume: {
     summary:
-      "High-achieving 10th-grade student (Rising Junior) with a 3.98 GPA — competitive debater, self-taught engineer, four-time founder. Disciplined fast-learner with strong communication and analytical skills, seeking a summer opportunity to contribute to team goals while gaining exposure to a fast-paced work environment.",
+      "High-achieving 10th-grade student (Rising Junior) with a 4.00 GPA UW — competitive debater, self-taught engineer, four-time founder. Disciplined fast-learner with strong communication and analytical skills, seeking a summer opportunity to contribute to team goals while gaining exposure to a fast-paced work environment.",
     tabs: [
       {
         id: "education",
