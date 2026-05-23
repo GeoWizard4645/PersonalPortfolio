@@ -80,7 +80,7 @@ function Resume() {
         <div className="resume-doc__actions">
           <a
             className="btn-doc btn-doc--solid"
-            href="resume.vivaanshahani.com"
+            href="https://resume.vivaanshahani.com"
             target="_blank" rel="noopener noreferrer"
             data-cursor="hover"
           >
