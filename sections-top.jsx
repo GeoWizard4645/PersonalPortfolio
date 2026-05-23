@@ -105,7 +105,7 @@ function Hero() {
 
         <div className="hero__sub">
           <p className="hero__lede">
-            10th-grade student, 3.98 GPA. Co-founder of <em>Debate101</em>, varsity debater, self-taught engineer, saxophonist, DJ. I move between fields on purpose — and looking for a real summer engineering role to ship in.
+            10th-grade student, 4.00 GPA. Co-founder of <em>Debate101</em>, varsity debater, self-taught engineer, saxophonist, DJ. I move between fields on purpose — and looking for a real summer engineering role to ship in.
           </p>
           <div className="hero__scroll">
             <span>Scroll</span>
