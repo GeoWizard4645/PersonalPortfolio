@@ -23,6 +23,7 @@ function Resume() {
           <div className="resume-doc__contact">
             <a href="mailto:vivaan.shahani@gmail.com">vivaan.shahani@gmail.com</a>
             <a href="tel:+19145207210">+1 914-520-7210</a>
+            <a href="https://www.linkedin.com/in/vivaan-shahani-a682303b7/" target="_blank" rel="noopener noreferrer">linkedin.com/in/vivaan-shahani</a>
             <a href="https://vivshahani.medium.com/" target="_blank" rel="noopener noreferrer">vivshahani.medium.com</a>
             <a href="https://github.com/GeoWizard4645" target="_blank" rel="noopener noreferrer">github.com/GeoWizard4645</a>
           </div>
@@ -85,6 +86,10 @@ function Resume() {
             data-cursor="hover"
           >
             View Traditional Résumé
+            <span style={{ fontSize: 13 }}>↗</span>
+          </a>
+          <a className="btn-doc" href="https://www.linkedin.com/in/vivaan-shahani-a682303b7/" target="_blank" rel="noopener noreferrer" data-cursor="hover">
+            LinkedIn
             <span style={{ fontSize: 13 }}>↗</span>
           </a>
           <a className="btn-doc" href="mailto:vivaan.shahani@gmail.com" data-cursor="hover">

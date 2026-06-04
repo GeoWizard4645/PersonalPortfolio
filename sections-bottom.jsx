@@ -383,6 +383,7 @@ function Contact() {
           </div>
           <div className="contact__col">
             <div className="contact__col-label">Elsewhere</div>
+            <a href="https://www.linkedin.com/in/vivaan-shahani-a682303b7/" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
             <a href="https://github.com/GeoWizard4645" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
             <a href="https://vivshahani.medium.com/" target="_blank" rel="noopener noreferrer">Medium ↗</a>
             <a href="https://debate101.org" target="_blank" rel="noopener noreferrer">Debate101 ↗</a>
