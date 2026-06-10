@@ -8,7 +8,7 @@ window.PORTFOLIO_DATA = {
   about: {
     body: [
       "I'm a rising junior at Edgemont Jr./Sr. High, building things since 6th grade — when I shipped a tiny lemonade-stand game and never really stopped. Today, that means founding Debate101, writing on Medium, performing as a DJ, and self-teaching whatever the next project needs.",
-      "I move between fields on purpose. Debate sharpens the argument; engineering ships the artifact; writing makes both legible. I'm looking for a summer where I can put real code into a real product.",
+      "",
     ],
     stats: [
       { num: "4.00", unit: "GPA UW", label: "Academic standing — straight A's, AP CS + AP Euro" },
