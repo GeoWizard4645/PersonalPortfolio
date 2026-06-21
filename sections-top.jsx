@@ -118,7 +118,7 @@ function Hero() {
 }
 
 function Marquee() {
-  const items = ["Python", "Java", "Web", "CAD", "Debate", "Saxophone", "DJ", "Writing", "Lacrosse", "Black Belt"];
+  const items = ["Python", "Java", "React", "Swift", "Web", "CAD", "Debate", "Saxophone", "DJ", "Writing", "Lacrosse", "Black Belt"];
   const row = (
     <span>
       {items.map((s, i) => (

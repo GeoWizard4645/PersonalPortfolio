@@ -137,6 +137,8 @@ window.PORTFOLIO_DATA = {
           { name: "Python", cat: "Code" },
           { name: "Java", cat: "Code" },
           { name: "HTML / CSS / JS", cat: "Web" },
+          { name: "React — Foundational", cat: "Web" },
+          { name: "Swift — Foundational", cat: "Code" },
           { name: "Excel — Data Analysis", cat: "Analytics" },
           { name: "Paper Trading", cat: "Finance" },
           { name: "Macroeconomic Theory", cat: "Finance" },
