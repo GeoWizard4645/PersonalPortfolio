@@ -4,9 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark" />
-    <title>Vivaan Shahani — Portfolio</title>
-    <meta name="description" content="Vivaan Shahani — student, builder, debater, DJ. Interactive resume and projects." />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%237dd3fc'/%3E%3Ctext y='.92em' font-family='Helvetica,Arial,sans-serif' font-size='62' font-weight='700'%3EVS%3C/text%3E%3C/svg%3E" />
+    <title>Vivaan Shahani · Portfolio</title>
+    <meta name="description" content="Vivaan Shahani: student, builder, debater, DJ. Interactive resume and projects." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -14,33 +15,11 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap"
       rel="stylesheet"
     />
-
-    <link rel="stylesheet" href="styles.css" />
   </head>
-  <body data-bg-mode="grid">
-    <canvas class="bg-canvas" id="bg-canvas"></canvas>
+  <body>
+    <div class="bg-wash" aria-hidden="true"></div>
     <div class="bg-grain" aria-hidden="true"></div>
-
     <div id="root"></div>
-
-    <!-- React + Babel (pinned) -->
-    <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-
-    <!-- Plain JS helpers -->
-    <script src="data.js"></script>
-    <script src="cursor.js"></script>
-    <script src="bg.js"></script>
-
-    <!-- JSX -->
-    <script type="text/babel" src="tweaks-panel.jsx"></script>
-    <script type="text/babel" src="sections-top.jsx"></script>
-    <script type="text/babel" src="sections-resume.jsx"></script>
-    <script type="text/babel" src="sections-bottom.jsx"></script>
-    <script type="text/babel" src="app.jsx"></script>
-
-    <!-- Per-section exit transitions (runs after React mounts) -->
-    <script src="transitions.js"></script>
+    <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

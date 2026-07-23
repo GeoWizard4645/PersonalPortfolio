@@ -6,3 +6,10 @@
 !.dev.vars.example
 .env*
 !.env.example
+
+# build + deps
+node_modules/
+dist/
+
+# macOS
+.DS_Store
