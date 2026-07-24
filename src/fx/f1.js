@@ -33,10 +33,10 @@ const DONUT_RADIUS_FRAC = 0.12;
 const EDGE_ZONE = 0.05;
 
 /* RC / Rocket League-style ground car */
-const THROTTLE_ACCEL = 2000;
+const THROTTLE_ACCEL = 3332;
 const BRAKE_POWER = 1500;
 const REVERSE_ACCEL = 480;
-const MAX_SPEED = 640;
+const MAX_SPEED = 1066;
 const COAST_FRICTION = 880;
 const LATERAL_GRIP = 2.2;
 const TURN_BASE = 4.8;
