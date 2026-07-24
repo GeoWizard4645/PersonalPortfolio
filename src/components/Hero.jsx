@@ -2,6 +2,15 @@ import React from "react";
 import D from "../data.js";
 import ArrowKeysHint from "./ArrowKeysHint.jsx";
 
+/* Once May rolls around, that summer's application window is basically
+   closed, so point at next year's instead - keeps this line accurate
+   forever without a yearly edit. */
+function availabilityLabel() {
+  const now = new Date();
+  const summerYear = now.getMonth() >= 4 ? now.getFullYear() + 1 : now.getFullYear();
+  return `Available for Summer '${String(summerYear).slice(-2)}`;
+}
+
 /* The big hero. The scroll FX engine (fx/scrollFx.js) splits the title into
    per-letter dual layers at runtime: an outline ghost that stays put and a
    filled glyph that drops off the bottom of the screen as you scroll. */
@@ -16,7 +25,7 @@ export default function Hero() {
           </div>
           <div className="hero__meta-block" style={{ textAlign: "right" }}>
             <span className="hero__meta-block-label">Currently</span>
-            <span>{D.hero.available} · {D.hero.location}</span>
+            <span>{availabilityLabel()} · {D.hero.location}</span>
           </div>
         </div>
 

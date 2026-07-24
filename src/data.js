@@ -3,7 +3,6 @@ const PORTFOLIO_DATA = {
   hero: {
     role: "Student · Builder · Debater · DJ",
     location: "Scarsdale, NY",
-    available: "Available for Summer '26",
   },
   about: {
     body: [
