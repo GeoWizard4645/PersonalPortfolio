@@ -7,6 +7,7 @@ import Resume from "./components/Resume.jsx";
 import Projects from "./components/Projects.jsx";
 import ProjectsAll from "./components/ProjectsAll.jsx";
 import Contact, { FooterStrip } from "./components/Contact.jsx";
+import ArrowKeysHint from "./components/ArrowKeysHint.jsx";
 import { initFx, reinitFx } from "./fx/scrollFx.js";
 
 function readRoute() {
@@ -136,7 +137,8 @@ export default function App() {
             <div className="split-stage" data-screen-label="Split Transition">
               <div className="split-stage__bg" aria-hidden="true">
                 <div className="split-stage__teaser">
-                  <span className="split-stage__eyebrow">↓ Continue</span>
+                  <span className="split-stage__eyebrow">Continue</span>
+                  <ArrowKeysHint />
                   <span className="split-stage__mark">03</span>
                   <span className="split-stage__label"><span className="serif">Projects</span></span>
                 </div>

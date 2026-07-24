@@ -1,5 +1,6 @@
 import React from "react";
 import D from "../data.js";
+import ArrowKeysHint from "./ArrowKeysHint.jsx";
 
 /* The big hero. The scroll FX engine (fx/scrollFx.js) splits the title into
    per-letter dual layers at runtime: an outline ghost that stays put and a
@@ -29,9 +30,11 @@ export default function Hero() {
           <p className="hero__lede">
             10th-grade student, 4.00 GPA. COO of <em>FitFo</em>, co-founder of <em>Debate101</em>, varsity debater, self-taught engineer, saxophonist, DJ. I move between fields on purpose, and I'm looking for a real summer engineering role to ship in.
           </p>
-          <div className="hero__scroll">
-            <span>Scroll</span>
-            <span className="hero__scroll-line" />
+          <div className="hero__scroll-wrap">
+            <div className="hero__scroll">
+              <span>Scroll</span>
+            </div>
+            <ArrowKeysHint />
           </div>
         </div>
       </div>
