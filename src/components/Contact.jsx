@@ -10,18 +10,14 @@ export default function Contact() {
           <SplitText>Let's build</SplitText>
           <br /><SplitText delay={120}><span className="stroke">something</span></SplitText>{" "}<SplitText delay={240}>together.</SplitText>
         </h2>
-        <a className="contact__email" href="mailto:vivaan.shahani@gmail.com" data-cursor="hover">
-          vivaan.shahani@gmail.com →
+        <a className="contact__email" href="mailto:me@vivaanshahani.com" data-cursor="hover">
+          me@vivaanshahani.com →
         </a>
 
         <div className="contact__row">
           <div className="contact__col">
             <div className="contact__col-label">Email</div>
-            <a href="mailto:vivaan.shahani@gmail.com">vivaan.shahani@gmail.com</a>
-          </div>
-          <div className="contact__col">
-            <div className="contact__col-label">Phone</div>
-            <a href="tel:+19145207210">+1 914-520-7210</a>
+            <a href="mailto:me@vivaanshahani.com">me@vivaanshahani.com</a>
           </div>
           <div className="contact__col">
             <div className="contact__col-label">Elsewhere</div>
