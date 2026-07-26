@@ -162,6 +162,15 @@ img, svg { display: block; max-width: 100%; }
   align-items: center;
   gap: 18px;
 }
+.nav__caduceus-hint {
+  color: inherit;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  opacity: 0.32;
+  transition: opacity 220ms var(--ease);
+  white-space: nowrap;
+}
+.nav__caduceus-hint:hover { opacity: 0.9; }
 .nav__clock {
   display: inline-flex;
   align-items: center;
@@ -178,6 +187,7 @@ img, svg { display: block; max-width: 100%; }
 
 @media (max-width: 760px) {
   .nav__center { display: none; }
+  .nav__caduceus-hint { display: none; }
 }
 
 /* ===== Page shell ===== */

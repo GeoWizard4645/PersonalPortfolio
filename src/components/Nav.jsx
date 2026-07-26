@@ -41,6 +41,14 @@ export default function Nav({ active, onNav }) {
         ))}
       </div>
       <div className="nav__right">
+        <a
+          href="https://vivaanshahani.com/caduceus"
+          className="nav__caduceus-hint"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          looking for caduceus?
+        </a>
         <span className="nav__clock">
           <span className="nav__clock-dot" />
           NY · {tz}
