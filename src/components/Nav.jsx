@@ -47,7 +47,15 @@ export default function Nav({ active, onNav }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          looking for caduceus?
+          <img
+            src="/caduceus-mark.png"
+            alt=""
+            className="nav__caduceus-hint-mark"
+            width={9}
+            height={14}
+            decoding="async"
+          />
+          looking for Caduceus?
         </a>
         <span className="nav__clock">
           <span className="nav__clock-dot" />

@@ -163,8 +163,10 @@ img, svg { display: block; max-width: 100%; }
   gap: 18px;
 }
 .nav__caduceus-hint {
-  display: inline-block;
-  padding: 5px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px 5px 9px;
   border-radius: 999px;
   font-size: 10px;
   letter-spacing: 0.03em;
@@ -181,6 +183,13 @@ img, svg { display: block; max-width: 100%; }
   background: var(--accent);
   box-shadow: 0 0 16px var(--accent);
   transform: translateY(-1px);
+}
+.nav__caduceus-hint-mark {
+  flex-shrink: 0;
+  width: auto;
+  height: 14px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
 .nav__clock {
   display: inline-flex;
