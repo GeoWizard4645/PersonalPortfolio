@@ -163,14 +163,25 @@ img, svg { display: block; max-width: 100%; }
   gap: 18px;
 }
 .nav__caduceus-hint {
-  color: inherit;
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 999px;
   font-size: 10px;
-  letter-spacing: 0.02em;
-  opacity: 0.32;
-  transition: opacity 220ms var(--ease);
+  letter-spacing: 0.03em;
   white-space: nowrap;
+  color: var(--accent-ink);
+  background: color-mix(in oklch, var(--accent) 88%, transparent);
+  box-shadow: 0 0 12px color-mix(in oklch, var(--accent) 45%, transparent);
+  opacity: 0.92;
+  mix-blend-mode: normal;
+  transition: background 220ms var(--ease), box-shadow 220ms var(--ease), transform 220ms var(--ease);
 }
-.nav__caduceus-hint:hover { opacity: 0.9; }
+.nav__caduceus-hint:hover {
+  opacity: 1;
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent);
+  transform: translateY(-1px);
+}
 .nav__clock {
   display: inline-flex;
   align-items: center;
