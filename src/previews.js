@@ -1,5 +1,5 @@
 /* Small canvas painters for project preview cards.
-   Kinds: pulse, balance, dashboard, plotter, equalizer, lines, pixel. */
+   Kinds: pulse, caduceus, balance, dashboard, plotter, equalizer, lines, pixel. */
 export function paintPreview(canvas, kind) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   const r = canvas.getBoundingClientRect();
@@ -56,6 +56,28 @@ export function paintPreview(canvas, kind) {
     ctx.moveTo(wx + 6, wy - 4); ctx.lineTo(wx + ww - 6, wy - 4);
     ctx.moveTo(wx + 6, wy + wh + 4); ctx.lineTo(wx + ww - 6, wy + wh + 4);
     ctx.stroke();
+  } else if (kind === "caduceus") {
+    const cx = w * 0.62, top = h * 0.14, bot = h * 0.86;
+    ctx.strokeStyle = c1; ctx.lineWidth = 2.5; ctx.lineCap = "round"; ctx.lineJoin = "round";
+    ctx.beginPath(); ctx.moveTo(cx, top + h * 0.12); ctx.lineTo(cx, bot); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(cx - w * 0.14, top + h * 0.06); ctx.quadraticCurveTo(cx, top, cx + w * 0.14, top + h * 0.06);
+    ctx.stroke();
+    const snake = (dir) => {
+      ctx.beginPath();
+      const amp = w * 0.11 * dir;
+      for (let i = 0; i <= 24; i++) {
+        const t = i / 24;
+        const y = top + h * 0.22 + t * (bot - top - h * 0.28);
+        const x = cx + amp * Math.sin(t * Math.PI * 3.2);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    };
+    snake(-1);
+    snake(1);
+    ctx.fillStyle = c1;
+    ctx.beginPath(); ctx.arc(cx, top + h * 0.1, 3, 0, Math.PI * 2); ctx.fill();
   } else if (kind === "balance") {
     const cx = w / 2, cy = h / 2;
     ctx.strokeStyle = c1; ctx.lineWidth = 2.5; ctx.lineCap = "round";

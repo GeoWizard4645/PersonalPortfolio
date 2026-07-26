@@ -187,6 +187,22 @@ const PORTFOLIO_DATA = {
     },
     {
       num: "02",
+      title: "Caduceus",
+      role: "Creator. Designed and shipped a macOS command centre end to end.",
+      tags: ["macOS", "Desktop", "Tauri", "Local-first"],
+      year: "2026 →",
+      href: "https://caduceus.vivaanshahani.com",
+      preview: "caduceus",
+      what:
+        "A fast, local-first command centre for your Mac: a floating pixel staff, a palette that launches apps and does maths, clipboard history with optional encryption, on-device voice, and an AI layer that can drive your machine through Hermes Agent.",
+      did:
+        "Built the whole product with Tauri — Rust on the backend, TypeScript in the webview. Implemented the staff overlay, command palette and result providers, installed-app index, calculator, clipboard watcher and SQLite store, push-to-talk routing through Apple's Speech framework, and Hermes/OpenAI-compatible agent backends. Shipped releases, a one-line install script, and caduceus.vivaanshahani.com.",
+      learned:
+        "On desktop, security is the product shape: named IPC commands instead of a open shell, API keys that never leave the keychain, and no always-on microphone when the same app can control the screen.",
+      tools: ["Tauri", "Rust", "TypeScript", "SQLite", "Hermes Agent", "Apple Speech"],
+    },
+    {
+      num: "03",
       title: "Debate101",
       role: "Co-founded and built. Curriculum, design, and platform.",
       tags: ["Product", "Community", "Curriculum"],
@@ -202,7 +218,7 @@ const PORTFOLIO_DATA = {
       tools: ["HTML", "CSS", "JS", "Figma", "Notion"],
     },
     {
-      num: "03",
+      num: "04",
       title: "Sprig Dashboard",
       role: "Built my own multi-app system for Hack Club's Sprig handheld.",
       tags: ["Embedded", "Hardware", "MicroPython"],
@@ -218,7 +234,7 @@ const PORTFOLIO_DATA = {
       tools: ["MicroPython", "Raspberry Pi Pico", "uasyncio", "Public APIs"],
     },
     {
-      num: "04",
+      num: "05",
       title: "BlotInator",
       role: "Open-source contribution to Hack Club's Blot drawing robot.",
       tags: ["Open Source", "Generative Art", "Hack Club"],
@@ -234,7 +250,7 @@ const PORTFOLIO_DATA = {
       tools: ["JavaScript", "Node", "Hack Club Blot"],
     },
     {
-      num: "05",
+      num: "06",
       title: "DJ · Live Set",
       role: "Designed and shipped a personal DJ landing page from scratch.",
       tags: ["Web", "Audio", "Design"],
@@ -250,7 +266,7 @@ const PORTFOLIO_DATA = {
       tools: ["HTML", "CSS", "JS", "GitHub Pages", "Rekordbox", "Music Skills"],
     },
     {
-      num: "06",
+      num: "07",
       title: "Medium · Journalism",
       role: "Long-form essays and journalism · 15K+ reads.",
       tags: ["Writing", "Editorial"],
@@ -266,7 +282,7 @@ const PORTFOLIO_DATA = {
       tools: ["Notion", "Medium", "Research"],
     },
     {
-      num: "07",
+      num: "08",
       title: "Lemonade Stand",
       role: "The first thing I ever coded. Kept on purpose, for the through-line.",
       tags: ["Archive", "Origin"],

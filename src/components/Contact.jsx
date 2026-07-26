@@ -29,6 +29,7 @@ export default function Contact() {
             <a href="https://github.com/GeoWizard4645" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
             <a href="https://vivshahani.medium.com/" target="_blank" rel="noopener noreferrer">Medium ↗</a>
             <a href="https://fitfo.app" target="_blank" rel="noopener noreferrer">FitFo ↗</a>
+            <a href="https://caduceus.vivaanshahani.com" target="_blank" rel="noopener noreferrer">Caduceus ↗</a>
             <a href="https://debate101.org" target="_blank" rel="noopener noreferrer">Debate101 ↗</a>
           </div>
           <div className="contact__col">
