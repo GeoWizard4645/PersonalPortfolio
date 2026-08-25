@@ -27,6 +27,10 @@ export default function App() {
   useEffect(() => {
     document.body.setAttribute("data-route", route);
     window.scrollTo({ top: 0 });
+    document.title =
+      route === "projects-all"
+        ? "Projects · Vivaan Shahani"
+        : "Vivaan Shahani · Builder, Debater, DJ — Portfolio";
   }, [route]);
 
   // Smooth scroll handler
