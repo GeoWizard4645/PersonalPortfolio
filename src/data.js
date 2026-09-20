@@ -6,7 +6,7 @@ const PORTFOLIO_DATA = {
   },
   about: {
     body: [
-      "I'm a rising junior at Edgemont Jr./Sr. High, building things since 6th grade, when I shipped a tiny lemonade-stand game and never really stopped. Today that means serving as COO of FitFo, founding Debate101, writing on Medium, performing as a DJ, and self-teaching whatever the next project needs.",
+      "I'm a junior at Edgemont Jr./Sr. High, building things since 6th grade, when I shipped a tiny lemonade-stand game and never really stopped. Today that means serving as COO of FitFo, founding Debate101, writing on Medium, performing as a DJ, and self-teaching whatever the next project needs.",
       "",
     ],
     stats: [
@@ -18,7 +18,7 @@ const PORTFOLIO_DATA = {
   },
   resume: {
     summary:
-      "High-achieving 10th-grade student (rising junior) with a 4.00 GPA UW. Competitive debater, self-taught engineer, startup COO, and serial founder. Disciplined fast-learner with strong communication and analytical skills, seeking a summer opportunity to contribute to team goals while gaining exposure to a fast-paced work environment.",
+      "High-achieving 11th-grade student (junior) with a 4.00 GPA UW. Competitive debater, self-taught engineer, startup COO, and serial founder. Disciplined fast-learner with strong communication and analytical skills, seeking a summer opportunity to contribute to team goals while gaining exposure to a fast-paced work environment.",
     tabs: [
       {
         id: "education",
