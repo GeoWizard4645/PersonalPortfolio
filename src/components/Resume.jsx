@@ -20,7 +20,7 @@ export default function Resume() {
               Vivaan Shahani<span className="serif">,</span>
               <br />a one-page <span className="serif">résumé.</span>
             </h2>
-            <div className="resume-doc__subtitle">10th grade · Edgemont '28 · Scarsdale, NY</div>
+            <div className="resume-doc__subtitle">11th grade · Edgemont '28 · Scarsdale, NY</div>
           </div>
           <div className="resume-doc__contact">
             <a href="mailto:me@vivaanshahani.com">me@vivaanshahani.com</a>
