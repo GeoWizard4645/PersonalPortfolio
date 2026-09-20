@@ -37,7 +37,7 @@ export default function Hero() {
 
         <div className="hero__sub">
           <p className="hero__lede">
-            10th-grade student, 4.00 GPA. COO of <em>FitFo</em>, co-founder of <em>Debate101</em>, varsity debater, self-taught engineer, saxophonist, DJ. I move between fields on purpose, and I'm looking for a real summer engineering role to ship in.
+            11th-grade student, 4.00 GPA. COO of <em>FitFo</em>, co-founder of <em>Debate101</em>, varsity debater, self-taught engineer, saxophonist, DJ. I move between fields on purpose, and I'm looking for a real summer engineering role to ship in.
           </p>
           <div className="hero__scroll-wrap">
             <div className="hero__scroll">
